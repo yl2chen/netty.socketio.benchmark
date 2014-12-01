@@ -1,0 +1,163 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.nettysio.benchmark</groupId>
+  <artifactId>nettysio-benchmark</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>nettysio-benchmark</name>
+  <dependencies>
+    <!-- guice -->
+    <dependency>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
+      <version>4.0-beta5</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.inject.extensions</groupId>
+      <artifactId>guice-multibindings</artifactId>
+      <version>4.0-beta5</version>
+    </dependency>
+
+    <!-- akka -->
+    <dependency>
+      <groupId>com.typesafe.akka</groupId>
+      <artifactId>akka-actor_2.11</artifactId>
+      <version>2.3.7</version>
+    </dependency>
+
+    <!-- socketio client -->
+    <dependency>
+      <groupId>com.github.nkzawa</groupId>
+      <artifactId>socket.io-client</artifactId>
+      <version>0.3.0</version>
+    </dependency>
+
+    <!-- guava -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>18.0</version>
+    </dependency>
+
+    <!-- netty sockitio -->
+    <dependency>
+      <groupId>com.corundumstudio.socketio</groupId>
+      <artifactId>netty-socketio</artifactId>
+      <version>1.7.4</version>
+    </dependency>
+
+    <!-- logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.7</version>
+    </dependency>
+
+    <!-- COMPILE DEPENDENCIES -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.14.8</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- TEST DEPENDENCIES -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <id>client</id>
+      <build>
+        <plugins>
+          <!-- mvn exec plugin -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.3.2</version>
+            <configuration>
+              <mainClass>com.nettysio.benchmark.Server</mainClass>
+              <arguments>
+                <argument>client</argument>
+                <argument>10</argument><!-- concurrency -->
+                <argument>10</argument><!-- client event interval in ms -->
+                <argument>20</argument><!-- return trip cutoff time in ms-->
+              </arguments>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>server</id>
+      <build>
+        <plugins>
+          <!-- mvn exec plugin -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.3.2</version>
+            <configuration>
+              <mainClass>com.nettysio.benchmark.Server</mainClass>
+              <arguments>
+                <argument>server</argument>
+              </arguments>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <build>
+    <plugins>
+      <!-- Make this jar executable -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>com.nettysio.benchmark.Server</mainClass>
+              <classpathPrefix>dependency-jars/</classpathPrefix>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Copy project dependency -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.5.1</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <!-- exclude junit, we need runtime dependency only -->
+              <includeScope>runtime</includeScope>
+              <outputDirectory>${project.build.directory}/dependency-jars/</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
